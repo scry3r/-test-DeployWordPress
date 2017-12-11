@@ -1,0 +1,7 @@
+---
+# handlers file for wpdeploy
+- name: restart nginx
+  action: service name=nginx state=restarted
+
+- name: restart php7.0-fpm
+  action: service name=php7.0-fpm.service state=restarted

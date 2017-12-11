@@ -1,0 +1,39 @@
+---
+- import_tasks: add_repo.yml
+  tags:
+   - common
+   - add_repo
+
+- name: Install Software
+  apt: pkg={{ item }} state=installed update_cache=true
+  with_items:
+    - aptitude
+    - git
+    - mercurial
+    - unzip
+    - htop
+    - rsync
+    - ranger
+    - nmap
+    - traceroute
+    - pwgen
+  tags:
+   - common
+   - install_pkg
+
+- name: Generate Locale
+  locale_gen: name={{ item }} state=present
+  with_items:
+    - en_GB.UTF-8
+    - en_US.UTF-8
+    - ru_RU.UTF-8
+    - uk_UA.UTF-8
+  tags:
+   - common
+   - locale
+
+- name: Perform Safe Upgrade
+  apt: upgrade=safe update_cache=yes
+  tags:
+   - update
+   - common

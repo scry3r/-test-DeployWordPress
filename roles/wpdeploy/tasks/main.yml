@@ -1,0 +1,83 @@
+---
+# tasks file for wpdeploy
+- name: Copy WordPress archive
+  copy:
+    src: wp-for-testing.zip
+    dest: /tmp/
+  tags:
+    - wp_install
+
+- name: Extract archive
+  unarchive:
+    src: /tmp/wp-for-testing.zip
+    dest: /var/www/html/
+    remote_src: yes
+  tags:
+    - wp_install
+
+- name: Add group "wordpress"
+  group: name=wordpress
+  tags:
+    - wp_install
+
+- name: Add user "wordpress"
+  user: name=wordpress group=wordpress home=/var/www/html/
+  tags:
+    - wp_install
+
+# - name: Fetch random salts for WordPress config
+#   command: chdir=/var/www/html/
+#   local_action: command curl https://api.wordpress.org/secret-key/1.1/salt/
+#   register: "wp_salt"
+#   tags:
+#     - wp_install
+
+# - name: Remove wp-config.php
+#   shell: rm /var/www/html/wordpress3/wp-config.php
+#   tags:
+#     - wp_install
+
+# - name: Copy WordPress config file
+#   template: src=wp-config.php.j2 dest=/var/www/html/wordpress3/wp-config.php
+#   tags:
+#     - wp_install
+
+- name: Update WordPress config file
+  lineinfile:
+    dest=/var/www/html/wordpress3/wp-config.php
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+  with_items:
+    - {'regexp': "define\\('DB_NAME', '(.)+'\\);", 'line': "define('DB_NAME', '{{wp_db_name}}');"}
+    - {'regexp': "define\\('DB_USER', '(.)+'\\);", 'line': "define('DB_USER', '{{wp_db_user}}');"}
+    - {'regexp': "define\\('DB_PASSWORD', '(.)+'\\);", 'line': "define('DB_PASSWORD', '{{wp_db_pass}}');"}
+    - {'regexp': "define\\('DB_HOST', '(.)+'\\);", 'line': "define('DB_HOST', '{{wp_db_host}}');"}
+  tags:
+    - wp_install
+
+- name: Change ownership of WordPress installation
+  file: path=/var/www/html/ owner=wordpress group=wordpress state=directory recurse=yes setype=httpd_sys_content_t
+  tags:
+    - wp_install
+
+- name: Remove Default Nginx vhost
+  shell: rm /etc/nginx/sites-enabled/default
+  ignore_errors: yes
+  tags:
+    - wp_install
+
+- name: Remove old Nginx vhost
+  shell: rm /etc/nginx/sites-enabled/virtualhost.conf
+  ignore_errors: yes
+  tags:
+    - wp_install
+
+- name: Template Wp Nginx config
+  template:
+    src: virtualhost.conf.j2
+    dest: /etc/nginx/sites-enabled/virtualhost.conf
+  notify:
+    - restart nginx
+    - restart php7.0-fpm
+  tags:
+    - wp_install

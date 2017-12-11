@@ -1,0 +1,7 @@
+---
+- apt_repository:
+    repo: deb http://archive.canonical.com/ubuntu xenial partner
+    state: present
+
+- apt_repository:
+    repo: 'ppa:nginx/stable'

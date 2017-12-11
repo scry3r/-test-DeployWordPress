@@ -1,0 +1,6 @@
+---
+- name: ensure mysql is running and starts on boot
+  service: name=mysql state=started enabled=true
+
+- name: restart mysql
+  service: name=mysql state=restarted

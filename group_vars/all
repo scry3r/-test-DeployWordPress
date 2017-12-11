@@ -1,0 +1,7 @@
+website_name: testtask
+wp_db_name: wordpress3
+wp_db_pass: eek7thoo2R
+wp_db_user: wordpress3
+root_pass: EeTh9aeto2
+wp_db_host: 192.168.10.11
+wp_web_host: 192.168.10.10

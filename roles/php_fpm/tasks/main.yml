@@ -1,0 +1,33 @@
+---
+# tasks file for php_fpm
+- name: Install packages
+  apt: name={{item}} state=installed
+  with_items:
+    - php
+    - php-fpm
+    - php-intl
+    - php-opcache
+    - php-cli
+    - php-fpm
+    - php-cgi
+    - php-mysql
+    - php-xmlrpc
+    - php-curl
+    - php-gd
+    - php-pear
+    - php-imap
+    - php-mcrypt
+    - php-pspell
+  tags:
+    - php
+
+- name: Configure PHP-FPM Pool
+  copy:
+    src: www.conf
+    dest: /etc/php-fpm.d/
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - php
+    - php_configure

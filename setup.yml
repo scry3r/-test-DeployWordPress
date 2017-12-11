@@ -1,0 +1,20 @@
+---
+- hosts: servers
+  gather_facts: False
+  pre_tasks:
+    - name: install python 2
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-simplejson)
+
+- hosts: servers
+  roles:
+    - common
+
+- hosts: web
+  roles:
+    - nginx
+    - php_fpm
+    - wpdeploy
+
+- hosts: datab
+  roles:
+    - datab

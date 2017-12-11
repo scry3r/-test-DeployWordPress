@@ -1,0 +1,31 @@
+---
+- name: Install Nginx
+  apt: pkg={{ item }} state=installed update-cache=yes
+  with_items:
+    - nginx
+    - fcgiwrap
+    - openssl
+    - ssl-cert
+    - nginx-extras
+    - mysql-client
+  tags:
+    - nginx
+
+- name: Nginx Config
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/
+  notify: reload nginx
+  tags:
+    - nginx
+    - nginx_config
+
+- name: Site Config
+  copy: src={{ item }} dest=/etc/nginx/site-enabled/
+  with_items:
+    - status.conf
+#    - wordpress.conf
+  notify: reload nginx
+  tags:
+    - nginx
+    - site_config
